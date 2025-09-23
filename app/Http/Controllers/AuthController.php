@@ -52,4 +52,35 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Logged out successfully']);
     }
+    public function updateProfile(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $authUser = $request->user(); // user yang sedang login
+
+        $request->validate([
+            'fullname' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'role' => 'nullable|in:super-admin,admin,cleaning-service,user'
+        ]);
+
+        // Data update default
+        $data = [
+            'fullname' => $request->fullname,
+            'username' => $request->username,
+            'email' => $request->email,
+        ];
+
+        // Hanya super-admin yang boleh mengganti role
+        if ($request->has('role') && $authUser->role === 'super-admin') {
+            $data['role'] = $request->role;
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user' => $user
+        ], 200);
+    }
 }

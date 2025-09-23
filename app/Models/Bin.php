@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Bin extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'location_photo',
+        'location_description',
+        'token',
+    ];
 }
