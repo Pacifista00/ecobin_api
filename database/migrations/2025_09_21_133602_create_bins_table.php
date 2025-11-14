@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->string('name');
             $table->string('location_photo');
             $table->string('location_description');
+            $table->boolean('organic_full')->default(false);
+            $table->boolean('anorganic_full')->default(false);
             $table->string('token')->nullable()->unique();
             $table->timestamps();
         });
