@@ -159,4 +159,18 @@ class UserController extends Controller
             'message' => 'Pengguna berhasil dihapus.'
         ], 200);
     }
+    // App/Http/Controllers/UserController.php (Contoh)
+
+    public function saveFcmToken(Request $request)
+    {
+        $request->validate(['fcm_token' => 'required|string']);
+
+        // Asumsi pengguna sudah terotentikasi via middleware('auth:sanctum')
+        $user = $request->user();
+        $user->update([
+            'fcm_token' => $request->fcm_token
+        ]);
+
+        return response()->json(['message' => 'FCM Token updated successfully']);
+    }
 }

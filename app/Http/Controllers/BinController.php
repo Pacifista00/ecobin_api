@@ -6,6 +6,8 @@ use App\Models\Bin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Str;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification as FcmNotification;
 
 class BinController extends Controller
 {
@@ -37,7 +39,7 @@ class BinController extends Controller
         // Simpan file foto
         $path = $request->file('location_photo')->store('bins', 'public');
 
-        // Generate token 16 digit unik
+        // Generate token 16 digit
         do {
             $token = Str::random(16);
         } while (Bin::where('token', $token)->exists());

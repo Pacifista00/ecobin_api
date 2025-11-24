@@ -3,6 +3,7 @@
 use App\Http\Controllers\BinController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\SensorController;
+use App\Http\Controllers\UserController;
 use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,7 +38,7 @@ Route::delete('/user/delete/{id}', [App\Http\Controllers\UserController::class, 
 Route::get('/bins', [BinController::class, 'index']);
 Route::post('/bin/add', [BinController::class, 'store']);
 Route::get('/bin/{id}', [BinController::class, 'show']);
-Route::put('/bin/update/{id}', [BinController::class, 'update']);
+Route::post('/bin/update/{id}', [BinController::class, 'update']);
 Route::delete('/bin/delete/{id}', [BinController::class, 'destroy']);
 
 Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index']);
@@ -47,6 +48,9 @@ Route::get('/bin-sensors', [SensorController::class, 'bins']);
 Route::post('/sensor/{token}', [SensorController::class, 'store']);
 
 Route::get('/empty-bin/{id}/{type}', [HistoryController::class, 'emptyBin']);
+
+// routes/api.php
+Route::post('/fcm-token', [UserController::class, 'saveFcmToken'])->middleware('auth:sanctum');
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
