@@ -7,6 +7,7 @@ use App\Models\Bin;
 use App\Models\History;
 use App\Models\Notification;
 use App\Models\Sensor;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class SensorController extends Controller
@@ -22,7 +23,10 @@ class SensorController extends Controller
     }
     public function store(Request $request, $token)
     {
-        $deviceToken = config('services.firebase.device_token');
+        $tokens = User::where('role', 'cleaning-service')
+            ->join('user_tokens', 'users.id', '=', 'user_tokens.user_id')
+            ->pluck('user_tokens.fcm_token')
+            ->toArray();
 
         $request->validate([
             'organic_volume' => 'required|integer|min:1|max:100',
@@ -54,32 +58,40 @@ class SensorController extends Controller
         }
 
         if (!$organicWasFull && $request->organic_volume > 85) {
+
             Notification::create([
                 'title' => 'Tempat Sampah Organik Penuh',
-                'description' => 'Kapasitas ' . $bin->name . ' organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!',
+                'description' => "Kapasitas {$bin->name} organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!",
             ]);
-            FcmSend::send(
-                $deviceToken,
-                "Ecobin",
-                "Kapasitas {$bin->name} organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!"
-                ,
-                ["page" => "home"]
-            );
+
+            foreach ($tokens as $token) {
+                FcmSend::send(
+                    $token,
+                    "Ecobin",
+                    "Kapasitas {$bin->name} organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!",
+                    ["page" => "home"]
+                );
+            }
         }
 
-        if (!$anorganicWasFull && $request->anorganic_volume > 85) {
+
+        if (!$organicWasFull && $request->organic_volume > 85) {
+
             Notification::create([
-                'title' => 'Tempat Sampah Anorganik Penuh',
-                'description' => 'Kapasitas ' . $bin->name . ' anorganik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!',
+                'title' => 'Tempat Sampah Organik Penuh',
+                'description' => "Kapasitas {$bin->name} organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!",
             ]);
-            FcmSend::send(
-                $deviceToken,
-                "Ecobin",
-                "Kapasitas {$bin->name} anorganik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!"
-                ,
-                ["page" => "home"]
-            );
+
+            foreach ($tokens as $token) {
+                FcmSend::send(
+                    $token,
+                    "Ecobin",
+                    "Kapasitas {$bin->name} organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!",
+                    ["page" => "home"]
+                );
+            }
         }
+
 
         // Organik dikosongkan
         if (

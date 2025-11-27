@@ -39,9 +39,9 @@ class BinController extends Controller
         // Simpan file foto
         $path = $request->file('location_photo')->store('bins', 'public');
 
-        // Generate token 16 digit
+        // Generate token 10 digit
         do {
-            $token = Str::random(16);
+            $token = Str::random(10);
         } while (Bin::where('token', $token)->exists());
 
         $bin = Bin::create([

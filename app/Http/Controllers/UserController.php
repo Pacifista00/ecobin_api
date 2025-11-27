@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -163,14 +164,25 @@ class UserController extends Controller
 
     public function saveFcmToken(Request $request)
     {
-        $request->validate(['fcm_token' => 'required|string']);
-
-        // Asumsi pengguna sudah terotentikasi via middleware('auth:sanctum')
-        $user = $request->user();
-        $user->update([
-            'fcm_token' => $request->fcm_token
+        $request->validate([
+            'token' => 'required'
         ]);
 
-        return response()->json(['message' => 'FCM Token updated successfully']);
+        $user = auth()->user();
+
+        // Cek apakah token sudah ada (hindari duplicate)
+        UserToken::updateOrCreate(
+            [
+                'fcm_token' => $request->token,
+            ],
+            [
+                'user_id' => $user->id,
+            ]
+        );
+
+        return response()->json([
+            "success" => true,
+            "message" => "FCM token saved."
+        ]);
     }
 }

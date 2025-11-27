@@ -51,7 +51,7 @@ Route::post('/sensor/{token}', [SensorController::class, 'store']);
 Route::get('/empty-bin/{id}/{type}', [HistoryController::class, 'emptyBin']);
 
 // routes/api.php
-Route::post('/fcm-token', [UserController::class, 'saveFcmToken'])->middleware('auth:sanctum');
+Route::post('/save-fcm-token', [UserController::class, 'saveFcmToken'])->middleware('auth:sanctum');
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
