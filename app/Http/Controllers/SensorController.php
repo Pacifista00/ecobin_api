@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FcmSend;
 use App\Models\Bin;
 use App\Models\History;
 use App\Models\Notification;
@@ -21,6 +22,8 @@ class SensorController extends Controller
     }
     public function store(Request $request, $token)
     {
+        $deviceToken = config('services.firebase.device_token');
+
         $request->validate([
             'organic_volume' => 'required|integer|min:1|max:100',
             'anorganic_volume' => 'required|integer|min:1|max:100',
@@ -55,6 +58,13 @@ class SensorController extends Controller
                 'title' => 'Tempat Sampah Organik Penuh',
                 'description' => 'Kapasitas ' . $bin->name . ' organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!',
             ]);
+            FcmSend::send(
+                $deviceToken,
+                "Ecobin",
+                "Kapasitas {$bin->name} organik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!"
+                ,
+                ["page" => "home"]
+            );
         }
 
         if (!$anorganicWasFull && $request->anorganic_volume > 85) {
@@ -62,6 +72,13 @@ class SensorController extends Controller
                 'title' => 'Tempat Sampah Anorganik Penuh',
                 'description' => 'Kapasitas ' . $bin->name . ' anorganik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!',
             ]);
+            FcmSend::send(
+                $deviceToken,
+                "Ecobin",
+                "Kapasitas {$bin->name} anorganik sudah lebih dari 85%. Segera kosongkan untuk menghindari sampah menumpuk!"
+                ,
+                ["page" => "home"]
+            );
         }
 
         // Organik dikosongkan
@@ -71,7 +88,7 @@ class SensorController extends Controller
         ) {
             History::create([
                 'bin_id' => $bin->id,
-                'information' => 'Tempat sampah organik dikosongkan pada ' . now()->format('H:i'),
+                'information' => $bin->name . ' organik dikosongkan pada ' . now()->format('H:i'),
             ]);
 
             // Reset status penuh
@@ -85,7 +102,7 @@ class SensorController extends Controller
         ) {
             History::create([
                 'bin_id' => $bin->id,
-                'information' => 'Tempat sampah anorganik dikosongkan pada ' . now()->format('d-m-Y H:i'),
+                'information' => $bin->name . 'anorganik dikosongkan pada ' . now()->format('d-m-Y H:i'),
             ]);
 
             // Reset status penuh

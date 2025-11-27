@@ -42,6 +42,7 @@ Route::post('/bin/update/{id}', [BinController::class, 'update']);
 Route::delete('/bin/delete/{id}', [BinController::class, 'destroy']);
 
 Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index']);
+Route::get('/tes-notif', [App\Http\Controllers\NotificationController::class, 'test']);
 Route::get('/histories', [App\Http\Controllers\HistoryController::class, 'index']);
 
 Route::get('/bin-sensors', [SensorController::class, 'bins']);

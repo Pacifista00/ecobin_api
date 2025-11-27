@@ -103,13 +103,13 @@ class UserController extends Controller
         }
 
         if (isset($validatedData['role'])) {
-            if ($authUser && $authUser->role === 'super-admin') {
-                $dataToUpdate['role'] = $validatedData['role'];
-            } else {
-                return response()->json([
-                    'message' => 'Anda tidak memiliki izin untuk mengubah peran (role) pengguna.'
-                ], 403);
-            }
+            // if ($authUser && $authUser->role === 'super-admin') {
+            $dataToUpdate['role'] = $validatedData['role'];
+            // } else {
+            //     return response()->json([
+            //         'message' => 'Anda tidak memiliki izin untuk mengubah peran (role) pengguna.'
+            //     ], 403);
+            // }
         }
 
         if (!empty($dataToUpdate)) {
